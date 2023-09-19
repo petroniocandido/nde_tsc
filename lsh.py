@@ -24,3 +24,18 @@ class LSH(nn.Module):
 
   def encode(self, x):
     return self.forward(x)
+  
+def setup(lsh, name, train_split, string_labels=True, batch_size = 80, out_dim = 10):
+  ds = ClassificationTS(name, train_split, string_labels=string_labels)
+  treino_loader = DataLoader(ds.train(), batch_size=batch_size, shuffle=True)
+  teste_loader = DataLoader(ds.test(), batch_size=batch_size, shuffle=True)
+  ls = lsh(ds.num_attributes, ds.num_samples, out_dim)
+  return ls, treino_loader, teste_loader, "nde_ls_" + name + "_{}.pt".format(date.today())
+
+def load(lsh, name, train_split = 10, string_labels=True, out_dim = 10, arquivo = None, date = date.today()):
+  ds = ClassificationTS(name, train_split, string_labels=string_labels)
+  ls = lsh(ds.num_attributes, ds.num_samples, out_dim)
+  if arquivo is None:
+    arquivo = "nde_ls_" + name +  "_{}.pt".format(date)
+  resume(ls, arquivo)
+  return ls

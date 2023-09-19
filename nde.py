@@ -47,6 +47,5 @@ class NDE(nn.Module):
     p = self.conditional_probability(x, k=k)
     return torch.argmax(p).cpu().numpy()
 
-
   def __call__(self, x):
     return self.forward(x)
