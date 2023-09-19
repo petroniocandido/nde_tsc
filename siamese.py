@@ -71,7 +71,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
     # TRAIN
     ##################
 
-    modelo.train()              # Habilita o treinamento do modelo
+    model.train()              # Habilita o treinamento do modelo
 
     losses = []
     for Xa, ya, Xp, yp, Xn, yn in train_ldr:
