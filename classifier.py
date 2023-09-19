@@ -1,8 +1,12 @@
 import numpy as np
+from datetime import date
+from tqdm import tqdm
+
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
-from tqdm import tqdm
+from torch.utils.data import Dataset, DataLoader
+
 from nde_tsc.common import checkpoint, checkpoint_all
 
 
@@ -152,3 +156,17 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
   checkpoint(model, file_checkpoint)
 
   return loss_train, loss_test
+
+
+def setup(dataset, encoder, batch_size = 80, in_dim = 10):
+  treino_loader = DataLoader(EmbeddedTS(dataset.train(), encoder), batch_size=batch_size, shuffle=True)
+  teste_loader = DataLoader(EmbeddedTS(dataset.test(), encoder), batch_size=batch_size, shuffle=True)
+  cf = Classifier(in_dim, len(dataset.labels))
+  return cf, treino_loader, teste_loader, "nde_cf_" + dataset.name + "_{}.pt".format(date.today())
+
+
+def load(dataset, in_dim = 10, date = date.today()):
+  cf = Classifier(in_dim, len(dataset.labels))
+  arquivo = "nde_cf_" + dataset.name + "_{}.pt".format(date)
+  resume(cf, arquivo)
+  return cf

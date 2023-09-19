@@ -1,9 +1,14 @@
 import numpy as np
+from datetime import date
+from tqdm import tqdm
+
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
-from tqdm import tqdm
+from torch.utils.data import Dataset, DataLoader
+
 from nde_tsc.common import checkpoint, checkpoint_all
+from nde_tsc.data import ClassificationTS
 
 class AutoEncoderBase(nn.Module):
   def __init__(self, name, num_attributes, num_samples, out_dim, encoder, decoder):
@@ -283,3 +288,18 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
   checkpoint(model, file_checkpoint)
 
   return loss_train, loss_test
+
+def setup(autoencoder, name, train_split, string_labels=True, batch_size = 80, out_dim = 10):
+  ds = ClassificationTS(name, train_split, string_labels=string_labels)
+  treino_loader = DataLoader(ds.train(), batch_size=batch_size, shuffle=True)
+  teste_loader = DataLoader(ds.test(), batch_size=batch_size, shuffle=True)
+  ac = autoencoder(ds.num_attributes, ds.num_samples, out_dim)
+  return ac, treino_loader, teste_loader, "nde_ac_" + name + "_" + ac.name + "_{}.pt".format(date.today())
+
+def load(autoencoder, name, train_split = 10, string_labels=True, out_dim = 10, arquivo = None, date = date.today()):
+  ds = ClassificationTS(name, train_split, string_labels=string_labels)
+  ac = autoencoder(ds.num_attributes, ds.num_samples, out_dim)
+  if arquivo is None:
+    arquivo = "nde_ac_" + name + "_" + ac.name + "_{}.pt".format(date)
+  resume(ac, arquivo)
+  return ac

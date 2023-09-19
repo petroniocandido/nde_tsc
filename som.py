@@ -1,14 +1,14 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot  as plt
 from datetime import date
-import copy
+from tqdm import tqdm
 
 import torch
 from torch import nn, optim
 from torch.nn import functional as F
-from tqdm import tqdm
+from torch.utils.data import Dataset, DataLoader
+
 from nde_tsc.common import checkpoint, checkpoint_all
+from nde_tsc.data import EmbeddedTS
 
 
 class SOM(nn.Module):
@@ -187,3 +187,8 @@ def training_loop(embedded_ts, som, checkpoint_file, **kwargs):
 
   checkpoint(som, checkpoint_file)
 
+
+def setup(dataset, autoencoder, num_dim, num_classes, width=10, height=10):
+  som = SOM(width=width, height=height, num_dim = num_dim, num_classes = num_classes)
+  embed = EmbeddedTS(dataset.train(), autoencoder)
+  return embed, som, "nde_som_" + dataset.name + "_" + autoencoder.name + "_{}.pt".format(date.today())
