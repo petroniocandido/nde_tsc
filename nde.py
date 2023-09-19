@@ -14,6 +14,7 @@ from nde_tsc.som import SOM
 
 class NDE(nn.Module):
   def __init__(self, **kwargs):
+    super(NDE, self).__init__()
     self.dataset_name : str  = kwargs.get('dataset', '')
     self.num_attributes : int = kwargs.get('num_attributes', 10)
     self.num_samples : int = kwargs.get('num_attributes', 10)
@@ -26,8 +27,9 @@ class NDE(nn.Module):
     self.som_training_loop = kwargs.get('som_training_loop', None)
 
   def train(self):
-    self.encoder_training_loop(self.encoder)
+    train_loss, test_loss = self.encoder_training_loop(self.encoder)
     self.som_training_loop(self.som)
+    return train_loss, test_loss
 
   def forward(self, x, k = 3):
     e = self.encoder(x.view(1,self.num_attributes, self.num_samples))
