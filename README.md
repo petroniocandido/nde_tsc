@@ -1,2 +1,2 @@
-# nde_tsc
-Neural Density Estimation for Time Series Classification 
+# Self Organized Neural Density Estimation for Complex Time Series Classification
+
