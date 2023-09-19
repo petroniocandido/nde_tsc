@@ -7,8 +7,8 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from nde_tsc.common import checkpoint, checkpoint_all
-from nde_tsc.data import TripletClassificationTS
+from nde_tsc.common import checkpoint, checkpoint_all, resume
+from nde_tsc.data import TripletClassificationTS, data_augmentation
 from nde_tsc.autoencoder import EncoderConvFC1
 
 
@@ -158,7 +158,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
 
 def setup(siamese, name, train_split, string_labels=True, batch_size = 80, out_dim = 10):
-  ds = TripletClassificationTS(name, train_split, string_labels=string_labels)
+  ds = TripletClassificationTS(name, train_split, string_labels=string_labels, transforms=data_augmentation)
   treino_loader = DataLoader(ds.train(), batch_size=batch_size, shuffle=True)
   teste_loader = DataLoader(ds.test(), batch_size=batch_size, shuffle=True)
   sm = siamese(ds.num_attributes, ds.num_samples, out_dim)

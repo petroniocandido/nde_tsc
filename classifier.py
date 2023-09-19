@@ -7,7 +7,8 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from nde_tsc.common import checkpoint, checkpoint_all
+from nde_tsc.common import checkpoint, checkpoint_all, resume
+from nde_tsc.data import EmbeddedTS, data_augmentation
 
 
 class Classifier(nn.Module):
@@ -51,8 +52,8 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
   model.to(DEVICE)
 
-  learning_rate = kwargs.get('learning_rate', 0.0001)
-  optimizer = kwargs.get('opt', optim.Adadelta(model.parameters(), lr=learning_rate, weight_decay=0.0005))
+  learning_rate = kwargs.get('learning_rate', 0.001)
+  optimizer = kwargs.get('opt', optim.NAdam(model.parameters(), lr=learning_rate))
   loss = kwargs.get('loss', F.nll_loss)
   epochs = kwargs.get('epochs', 10)
   

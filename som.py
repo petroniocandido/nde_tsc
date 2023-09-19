@@ -9,8 +9,8 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from nde_tsc.common import checkpoint, checkpoint_all
-from nde_tsc.data import EmbeddedTS
+from nde_tsc.common import checkpoint, checkpoint_all, resume
+from nde_tsc.data import EmbeddedTS, data_augmentation
 
 
 class SOM(nn.Module):

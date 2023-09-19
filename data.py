@@ -10,6 +10,16 @@ import torch
 from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms as torch_transforms
+
+from nde_tsc.transforms import Noise, Linear
+
+
+data_augmentation = torch_transforms.RandomChoice([
+      Noise(type='unif', min=-.5, max=.5),
+      Linear(k=.9),
+      Linear(k=1.1)
+  ])
 
 
 class ClassificationTS(Dataset):

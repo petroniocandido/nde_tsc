@@ -10,7 +10,7 @@ import torch
 from torch import nn, optim
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms
+from torchvision import transforms as torch_transforms
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
