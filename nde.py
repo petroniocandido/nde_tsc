@@ -36,17 +36,20 @@ class NDE(nn.Module):
     som_training_loop(eds, self.som, file, **self.som_training_parameters)
     return train_loss, test_loss
   
-  def load_encoder(self, checkpoint_file):
+  def setup_encoder(self, checkpoint_file = None):
     self.encoder = self.encoder_fn(self.num_attributes, self.num_samples, self.out_dim)
-    resume(self.encoder, checkpoint_file)
+    if checkpoint_file is not None:
+      resume(self.encoder, checkpoint_file)
+      eds = EmbeddedTS(dataset, self.encoder)
+      file = "som_" + dataset.name + self.encoder.name + ".pt"
+      self.setup_som(self.som.num_classes, self.som.width, self.som.height, checkpoint_file=None)
+      som_training_loop(eds, self.som, file, **self.som_training_parameters)
 
-  def load_som(self, checkpoint_file):
-    num_classes = self.som.num_classes
-    width = self.som.width
-    height = self.som.height
+  def setup_som(self, num_classes, width, height, checkpoint_file = None):
     self.som = SOM(width = width, height = height, num_dim = self.out_dim, 
                          num_classes = num_classes)
-    resume(self.som, checkpoint_file)
+    if checkpoint_file is not None:
+      resume(self.som, checkpoint_file)
 
   def forward(self, x, k = 3):
     e = self.encoder(x.view(1, self.num_attributes, self.num_samples))
