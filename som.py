@@ -58,8 +58,7 @@ class SOM(nn.Module):
   def conditional_probability(self, x, k = 3):
     ret = torch.zeros(self.num_classes)
     for label in range(self.num_classes):
-      p = self.forward(x, mode = 'conditional', label = label, k = k)
-      ret[label] = self.class_weights[label] * p
+      ret[label] = self.forward(x, mode = 'conditional', label = label, k = k)
 
     return ret
 
