@@ -14,6 +14,8 @@ from torchvision import transforms as torch_transforms
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 def checkpoint(model, checkpoint_file):
   torch.save(model.state_dict(), checkpoint_file)
 

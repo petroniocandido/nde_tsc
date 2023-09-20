@@ -71,3 +71,8 @@ class NDE(nn.Module):
 
   def __call__(self, x):
     return self.forward(x)
+  
+  def to(self, device):
+    super().to(device)
+    self.encoder.to(device)
+    self.som.to(device)
