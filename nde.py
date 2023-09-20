@@ -45,7 +45,7 @@ class NDE(nn.Module):
     return self.forward(x, k=k)
   
   def conditional_probabilities(self, x, k = 3):
-    e = self.encoder(x.view(1, self.num_attributes, self.num_samples))
+    e = self.encoder.encode(x.view(1, self.num_attributes, self.num_samples))
     return self.som.conditional_probability(torch.flatten(e), k=k)
   
   def predict(self, x, k = 3):
