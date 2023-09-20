@@ -288,23 +288,8 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
         patience_count += 1
 
       if patience_count > patience:
-        return loss_train, loss_test
+        return loss_train, loss_test, file_checkpoint
 
   checkpoint(model, file_checkpoint)
 
-  return loss_train, loss_test
-
-def setup(autoencoder, name, train_split, string_labels=True, batch_size = 80, out_dim = 10):
-  ds = ClassificationTS(name, train_split, string_labels=string_labels, transforms=data_augmentation)
-  treino_loader = DataLoader(ds.train(), batch_size=batch_size, shuffle=True)
-  teste_loader = DataLoader(ds.test(), batch_size=batch_size, shuffle=True)
-  ac = autoencoder(ds.num_attributes, ds.num_samples, out_dim)
-  return ac, treino_loader, teste_loader, "nde_ac_" + name + "_" + ac.name + "_{}.pt".format(date.today())
-
-def load(autoencoder, name, train_split = 10, string_labels=True, out_dim = 10, arquivo = None, date = date.today()):
-  ds = ClassificationTS(name, train_split, string_labels=string_labels, transforms=data_augmentation)
-  ac = autoencoder(ds.num_attributes, ds.num_samples, out_dim)
-  if arquivo is None:
-    arquivo = "nde_ac_" + name + "_" + ac.name + "_{}.pt".format(date)
-  resume(ac, arquivo)
-  return ac
+  return loss_train, loss_test, file_checkpoint

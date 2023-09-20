@@ -30,10 +30,11 @@ class NDE(nn.Module):
     self.som_training_parameters = kwargs.get('som_training_parameters', None)
 
   def fit(self, dataset):
-    train_loss, test_loss = self.encoder_training_loop(self.encoder)
-    eds = EmbeddedTS(dataset, self.encoder)
-    file = "som_" + dataset.name + self.encoder.name + ".pt"
-    som_training_loop(eds, self.som, file, **self.som_training_parameters)
+    train_loss, test_loss, file_checkpoint = self.encoder_training_loop(self.encoder)
+    self.setup_encoder(checkpoint_file=file_checkpoint)
+    #eds = EmbeddedTS(dataset, self.encoder)
+    #file = "som_" + dataset.name + self.encoder.name + ".pt"
+    #som_training_loop(eds, self.som, file, **self.som_training_parameters)
     return train_loss, test_loss
   
   def setup_encoder(self, checkpoint_file = None):
