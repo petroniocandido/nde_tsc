@@ -44,7 +44,7 @@ class NDE(nn.Module):
     return self.som.conditional_probability(torch.flatten(e), k=k)
   
   def predict(self, x, k = 3):
-    p = self.conditional_probability(x, k=k)
+    p = self.conditional_probabilities(x, k=k)
     return torch.argmax(p).cpu().numpy()
 
   def __call__(self, x):
