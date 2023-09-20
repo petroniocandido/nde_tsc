@@ -24,8 +24,11 @@ class SOM(nn.Module):
     self.neighborhood_radius = kwargs.get('neighborhood', max(self.width, self.height) / 2.0)
     self.num_classes = kwargs.get('num_classes', 10)
     self.weights = torch.rand(self.size, self.num_dim, requires_grad=False)
+    self._class_weights = torch.zeros(self.num_classes, requires_grad = False)
     self.class_weights = torch.zeros(self.num_classes, requires_grad = False)
+    self._probabilities = torch.zeros(self.size, requires_grad=False)
     self.probabilities = torch.zeros(self.size, requires_grad=False)
+    self._conditional_probabilities = torch.zeros(self.num_classes, self.size, requires_grad=False)
     self.conditional_probabilities = torch.zeros(self.num_classes, self.size, requires_grad=False)
     index = np.array([(j,i) for j in range(self.height) for i in range(self.width)])
     self.index = torch.LongTensor(index)
@@ -113,25 +116,24 @@ class SOM(nn.Module):
       if prob == 'knn':
 
         for c, id in enumerate(idx):
-          self.probabilities[id] += dist[c]/torch.sum(dist)
+          self._probabilities[id] += dist[c]/torch.sum(dist)
 
         for c, id in enumerate(idx):
-          self.conditional_probabilities[y][id] += dist[c]/torch.sum(dist)
+          self._conditional_probabilities[y][id] += dist[c]/torch.sum(dist)
 
       elif prob == 'int':
 
         for c, id in enumerate(idx):
-          self.probabilities[id] += 1
+          self._probabilities[id] += 1
 
         for c, id in enumerate(idx):
-          self.conditional_probabilities[y][id] += 1
+          self._conditional_probabilities[y][id] += 1
 
-      self.probabilities /= torch.sum(self.probabilities)
-      self.conditional_probabilities[y] /= torch.sum(self.conditional_probabilities[y])
+      self.probabilities = self._probabilities / torch.sum(self._probabilities)
+      self.conditional_probabilities[y] = self._conditional_probabilities[y] / torch.sum(self._conditional_probabilities[y])
 
-      self.class_weights[y] += 1
-
-      self.class_weights[y] /= torch.sum(self.class_weights)
+      self._class_weights[y] += 1
+      self.class_weights[y] = self._class_weights[y] / torch.sum(self._class_weights)
 
 
 def plot_probability_map(som):
