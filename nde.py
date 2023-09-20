@@ -35,6 +35,18 @@ class NDE(nn.Module):
     file = "som_" + dataset.name + self.encoder.name + ".pt"
     som_training_loop(eds, self.som, file, **self.som_training_parameters)
     return train_loss, test_loss
+  
+  def load_encoder(self, checkpoint_file):
+    self.encoder = self.encoder_fn(self.num_attributes, self.num_samples, self.out_dim)
+    resume(self.encoder, checkpoint_file)
+
+  def load_som(self, checkpoint_file):
+    num_classes = self.som.num_classes
+    width = self.som.width
+    height = self.som.height
+    self.som = SOM(width = width, height = height, num_dim = self.out_dim, 
+                         num_classes = num_classes)
+    resume(self.som, checkpoint_file)
 
   def forward(self, x, k = 3):
     e = self.encoder(x.view(1, self.num_attributes, self.num_samples))

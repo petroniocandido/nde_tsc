@@ -221,6 +221,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
     model.train()              # Habilita o treinamento do modelo
 
     losses = []
+    _current_train_loss = 0
     for X, y in train_ldr:
 
       X = X.to(DEVICE)
@@ -237,6 +238,8 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
       # Grava as métricas de avaliação
       losses.append(_loss.cpu().item())
 
+      _current_train_loss += losses[-1]
+
     # Salva o valor médio das métricas de avaliação para o lote
     loss_train.append(np.mean(losses))
 
@@ -249,7 +252,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
     losses = []
     with torch.no_grad():
-      _current_loss = 0
+      _current_val_loss = 0
       for X, y in test_ldr:
         X = X.to(DEVICE)
 
@@ -261,29 +264,31 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
         losses.append(_loss_val.cpu().item())
 
         # Grava o _loss do erly stopping
-        _current_loss += losses[-1]
+        _current_val_loss += losses[-1]
 
       # Salva o valor médio das métricas de avaliação para o lote
       loss_test.append(np.mean(losses))
 
-      ##################
-      # EARLY STOPPING
-      ##################
+    ##################
+    # EARLY STOPPING
+    ##################
 
-      if early_stop:
+    if early_stop:
 
-        if _current_loss <= best_loss:
-          best_loss = _current_loss
-          patience_count = 0
+      _avg_loss = _current_train_loss + _current_val_loss
 
-          # Checkpoint do melhor modelo
-          checkpoint(model, file_checkpoint)
+      if _avg_loss <= best_loss:
+        best_loss = _avg_loss
+        patience_count = 0
 
-        else:
-          patience_count += 1
+        # Checkpoint do melhor modelo
+        checkpoint(model, file_checkpoint)
 
-        if patience_count > patience:
-          return loss_train, loss_test
+      else:
+        patience_count += 1
+
+      if patience_count > patience:
+        return loss_train, loss_test
 
   checkpoint(model, file_checkpoint)
 
