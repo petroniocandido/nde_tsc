@@ -14,29 +14,28 @@ from torchvision import transforms as torch_transforms
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-DISPOSITIVO_EXECUCAO = 'cuda' if torch.cuda.is_available() else 'cpu'
-DIRETORIO_PADRAO = "."
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def checkpoint(modelo, arquivo):
-  torch.save(modelo.state_dict(), DIRETORIO_PADRAO + arquivo)
+def checkpoint(model, checkpoint_file):
+  torch.save(model.state_dict(), checkpoint_file)
 
-def checkpoint_all(modelo, otimizador, arquivo):
+def checkpoint_all(model, optimizer, checkpoint_file):
   torch.save({
-    'optim': otimizador.state_dict(),
-    'model': modelo.state_dict(),
-}, DIRETORIO_PADRAO + arquivo)
+    'optim': optimizer.state_dict(),
+    'model': model.state_dict(),
+}, checkpoint_file)
 
-def resume(modelo, arquivo):
-  modelo.load_state_dict(torch.load(DIRETORIO_PADRAO + arquivo, map_location=torch.device(DISPOSITIVO_EXECUCAO)))
+def resume(model, checkpoint_file):
+  model.load_state_dict(torch.load(checkpoint_file, map_location=torch.device(DEVICE)))
 
-def resume_all(modelo, otimizador, arquivo):
-  checkpoint = torch.load(DIRETORIO_PADRAO + arquivo, map_location=torch.device(DISPOSITIVO_EXECUCAO))
-  modelo.load_state_dict(checkpoint['model'])
-  otimizador.load_state_dict(checkpoint['optim'])
+def resume_all(model, optimizer, checkpoint_file):
+  checkpoint = torch.load(checkpoint_file, map_location=torch.device(DEVICE))
+  model.load_state_dict(checkpoint['model'])
+  optimizer.load_state_dict(checkpoint['optim'])
 
 
 def classification_metrics(dataloader, model):
-  model.to(DISPOSITIVO_EXECUCAO)
+  model.to(DEVICE)
   model.eval()
   model.double()
 
@@ -45,8 +44,8 @@ def classification_metrics(dataloader, model):
   rec = []
   f1 = []
   for X,y in dataloader:
-    X = X.to(DISPOSITIVO_EXECUCAO)
-    prediction = model.predict(X).cpu().numpy()
+    X = X.to(DEVICE)
+    prediction = np.array([model.predict(k) for k in X])
     classes = np.array(y.cpu().tolist())
 
     acc.append(accuracy_score(classes, prediction))
