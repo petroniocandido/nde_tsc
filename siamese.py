@@ -142,7 +142,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
     if early_stop:
 
-       _avg_loss = _current_train_loss + _current_val_loss
+      _avg_loss = _current_train_loss + _current_val_loss
 
       if _avg_loss <= best_loss:
         best_loss = _avg_loss
