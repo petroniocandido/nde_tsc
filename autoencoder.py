@@ -187,7 +187,7 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
   learning_rate = kwargs.get('learning_rate', 0.0001)
   optimizer = kwargs.get('opt', optim.NAdam(model.parameters(), lr=learning_rate))
-  loss = kwargs.get('loss', nn.MSELoss())
+  loss = nn.MSELoss()
   epochs = kwargs.get('epochs', 10)
   
   early_stop = kwargs.get('early_stop', True)
@@ -225,11 +225,11 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
 
       X = X.to(DEVICE)
 
-      y_pred = model.forward(X)
+      X_pred = model.forward(X)
 
       optimizer.zero_grad()
 
-      _loss = loss(y_pred, X)
+      _loss = loss(X_pred, X)
 
       _loss.backward()
       optimizer.step()
@@ -253,9 +253,9 @@ def training_loop(train_ldr, test_ldr, model, **kwargs):
       for X, y in test_ldr:
         X = X.to(DEVICE)
 
-        y_pred_val = model.forward(X)
+        X_pred_val = model.forward(X)
 
-        _loss_val = loss(y_pred_val, X)
+        _loss_val = loss(X_pred_val, X)
 
         # Grava as métricas de avaliação
         losses.append(_loss_val.cpu().item())
