@@ -12,6 +12,7 @@ from torchvision import transforms
 
 from nde_tsc.som import SOM, training_loop as som_training_loop
 from nde_tsc.data import EmbeddedTS
+from nde_tsc.common import checkpoint, checkpoint_all, resume
 
 class NDE(nn.Module):
   def __init__(self, dataset, num_dim : int, **kwargs):
@@ -31,13 +32,13 @@ class NDE(nn.Module):
 
   def fit(self, dataset):
     train_loss, test_loss, file_checkpoint = self.encoder_training_loop(self.encoder)
-    self.setup_encoder(checkpoint_file=file_checkpoint)
+    self.setup_encoder(checkpoint_file=file_checkpoint, dataset = dataset)
     #eds = EmbeddedTS(dataset, self.encoder)
     #file = "som_" + dataset.name + self.encoder.name + ".pt"
     #som_training_loop(eds, self.som, file, **self.som_training_parameters)
     return train_loss, test_loss
   
-  def setup_encoder(self, checkpoint_file = None):
+  def setup_encoder(self, checkpoint_file = None, dataset = None):
     self.encoder = self.encoder_fn(self.num_attributes, self.num_samples, self.out_dim)
     if checkpoint_file is not None:
       resume(self.encoder, checkpoint_file)
