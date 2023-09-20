@@ -133,7 +133,7 @@ class SOM(nn.Module):
       self.conditional_probabilities[y] = self._conditional_probabilities[y] / torch.sum(self._conditional_probabilities[y])
 
       self._class_weights[y] += 1
-      self.class_weights[y] = self._class_weights[y] / torch.sum(self._class_weights)
+      self.class_weights = self._class_weights / torch.sum(self._class_weights)
 
 
 def plot_probability_map(som):

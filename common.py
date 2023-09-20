@@ -14,8 +14,6 @@ from torchvision import transforms as torch_transforms
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-
 def checkpoint(model, checkpoint_file):
   torch.save(model.state_dict(), checkpoint_file)
 
@@ -35,7 +33,7 @@ def resume_all(model, optimizer, checkpoint_file):
 
 
 def classification_metrics(dataloader, model):
-  model.to(DEVICE)
+  model.cpu()
   model.eval()
   model.double()
 
@@ -44,7 +42,7 @@ def classification_metrics(dataloader, model):
   rec = []
   f1 = []
   for X,y in dataloader:
-    X = X.to(DEVICE)
+    X = X.cpu()
     prediction = np.array([model.predict(k) for k in X])
     classes = np.array(y.cpu().tolist())
 
