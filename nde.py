@@ -17,7 +17,7 @@ class NDE(nn.Module):
     super(NDE, self).__init__()
     self.num_attributes : int = dataset.num_attributes
     self.num_samples : int = dataset.num_samples
-    self.out_dim : int = out_dim
+    self.out_dim : int = num_dim
 
     self.encoder_fn = kwargs.get('encoder', None)
     self.encoder = self.encoder_fn(self.num_attributes, self.num_samples, self.out_dim)
